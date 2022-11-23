@@ -291,7 +291,7 @@ while :; do
             ENABLE_THREADS=""
             ;;
         --win32-threads)
-            ENABLE_THREADS="--enable-threads=posix"
+            ENABLE_THREADS="--enable-threads=win32"
             ;;
         --cached-sources)
             CACHED_SOURCES=1
