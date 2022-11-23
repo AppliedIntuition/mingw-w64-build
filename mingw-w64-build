@@ -290,6 +290,9 @@ while :; do
         --disable-threads)
             ENABLE_THREADS=""
             ;;
+        --win32-threads)
+            ENABLE_THREADS="--enable-threads=posix"
+            ;;
         --cached-sources)
             CACHED_SOURCES=1
             ;;
