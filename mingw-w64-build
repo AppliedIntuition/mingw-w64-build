@@ -16,9 +16,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-ROOT_PATH="$HOME/.zeranoe/mingw-w64"
+ROOT_PATH="$HOME/"
 
-MINGW_W64_BRANCH="v9.x"
+MINGW_W64_BRANCH="v10.0.0"
 BINUTILS_BRANCH="binutils-2_37-branch"
 GCC_BRANCH="releases/gcc-11"
 
@@ -169,7 +169,7 @@ build()
     change_dir "$bld_path/binutils"
 
     execute "($arch): configuring Binutils" "" \
-        "$SRC_PATH/binutils/configure" --prefix="$prefix" --disable-shared \
+        "$SRC_PATH/binutils/configure" --prefix="$prefix" \
             --enable-static --with-sysroot="$prefix" --target="$host" \
             --disable-multilib --disable-nls --enable-lto --disable-gdb
 
@@ -194,7 +194,7 @@ build()
     change_dir "$bld_path/gcc"
 
     execute "($arch): configuring GCC" "" \
-        "$SRC_PATH/gcc/configure" --target="$host" --disable-shared \
+        "$SRC_PATH/gcc/configure" --target="$host" \
             --enable-static --disable-multilib --prefix="$prefix" \
             --enable-languages=c,c++ --disable-nls $ENABLE_THREADS \
             $i686_dwarf2
@@ -224,7 +224,7 @@ build()
 
         execute "($arch): configuring winpthreads" "" \
             "$SRC_PATH/mingw-w64/mingw-w64-libraries/winpthreads/configure" \
-                --build="$BUILD" --host="$host" --disable-shared \
+                --build="$BUILD" --host="$host" \
                 --enable-static --prefix="$prefix/$host"
 
         execute "($arch): building winpthreads" "" \
