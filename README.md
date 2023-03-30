@@ -22,6 +22,8 @@ Bash based shells.
 ## Usage
 See `mingw-w64-build --help` for all build options.
 
+Applied uses the `with-shared-libs` branch currently.
+
 ## License
 mingw-w64-build is licensed under the GNU GPL 3.0 or later. A copy of the
 license can be found in the LICENSE file.
