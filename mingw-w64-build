@@ -21,6 +21,7 @@ ROOT_PATH="$HOME/"
 MINGW_W64_BRANCH="v10.0.0"
 BINUTILS_BRANCH="binutils-2_37-branch"
 GCC_BRANCH="releases/gcc-11"
+GCC_COMMIT="HEAD"
 
 ENABLE_THREADS="--enable-threads=posix"
 
@@ -48,6 +49,7 @@ Options:
   --cached-sources             use existing sources instead of downloading new ones
   --binutils-branch <branch>   set Binutils branch (default: $BINUTILS_BRANCH)
   --gcc-branch <branch>        set GCC branch (default: $GCC_BRANCH)
+  --gcc-commit <commit>        set GCC commit (default: $GCC_COMMIT)
   --mingw-w64-branch <branch>  set MinGW-w64 branch (default: $MINGW_W64_BRANCH)
   --linked-runtime <runtime>   set MinGW Linked Runtime (default: $LINKED_RUNTIME)
 EOF
@@ -134,7 +136,8 @@ download_sources()
 
     execute "downloading GCC source" "" \
         git clone --depth 1 -b "$GCC_BRANCH" \
-            https://gcc.gnu.org/git/gcc.git gcc
+            https://gcc.gnu.org/git/gcc.git gcc && \
+        cd gcc && git checkout $GCC_COMMIT
 
     execute "downloading config.guess" "" \
         curl -o config.guess \
@@ -323,6 +326,20 @@ while :; do
             ;;
         --gcc-branch=)
             arg_error "'--gcc-branch' requires a non-empty option argument"
+            ;;
+        --gcc-commit)
+            if [ "$2" ]; then
+                GCC_COMMIT="$2"
+                shift
+            else
+                arg_error "'--gcc-commit' requires a non-empty option argument"
+            fi
+            ;;
+        --gcc-commit=?*)
+            GCC_COMMIT=${1#*=}
+            ;;
+        --gcc-commit=)
+            arg_error "'--gcc-commit' requires a non-empty option argument"
             ;;
         --linked-runtime)
             if [ "$2" ]; then
