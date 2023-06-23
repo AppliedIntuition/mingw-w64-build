@@ -20,8 +20,10 @@ ROOT_PATH="$HOME/"
 
 MINGW_W64_BRANCH="v10.0.0"
 BINUTILS_BRANCH="binutils-2_37-branch"
-GCC_BRANCH="releases/gcc-11"
-GCC_COMMIT="HEAD"
+GCC_BRANCH=""
+GCC_COMMIT=""
+# This is the default branch. We pick commit or branch based on the input.
+GCC_CHECKOUT="releases/gcc-11"
 
 ENABLE_THREADS="--enable-threads=posix"
 
@@ -48,8 +50,8 @@ Options:
   --disable-threads            disable pthreads and STL <thread>
   --cached-sources             use existing sources instead of downloading new ones
   --binutils-branch <branch>   set Binutils branch (default: $BINUTILS_BRANCH)
-  --gcc-branch <branch>        set GCC branch (default: $GCC_BRANCH)
-  --gcc-commit <commit>        set GCC commit (default: $GCC_COMMIT)
+  --gcc-branch <branch>        set GCC branch (default: $GCC_CHECKOUT)
+  --gcc-commit <commit>        set GCC commit
   --mingw-w64-branch <branch>  set MinGW-w64 branch (default: $MINGW_W64_BRANCH)
   --linked-runtime <runtime>   set MinGW Linked Runtime (default: $LINKED_RUNTIME)
 EOF
@@ -134,10 +136,10 @@ download_sources()
         git clone --depth 1 -b "$BINUTILS_BRANCH" \
             https://sourceware.org/git/binutils-gdb.git binutils
 
-    execute "downloading GCC source" "" \
-        git clone --depth 1 -b "$GCC_BRANCH" \
-            https://gcc.gnu.org/git/gcc.git gcc && \
-        cd gcc && git checkout $GCC_COMMIT
+    execute "downloading GCC source - getting https://github.com/gcc-mirror/gcc/archive/${GCC_CHECKOUT}.tar.gz from gcc-mirror on github" "" \
+        wget https://github.com/gcc-mirror/gcc/archive/${GCC_CHECKOUT}.tar.gz -O gcc.tgz && \
+        tar -zxvf gcc.tgz >> /dev/null && \
+        mv $(ls -d gcc-*/|head -n 1) gcc
 
     execute "downloading config.guess" "" \
         curl -o config.guess \
@@ -391,6 +393,20 @@ while :; do
 
     shift
 done
+
+# Validate gcc branch/commit inputs.
+if [ "$GCC_BRANCH" ] && [ "$GCC_COMMIT" ]; then
+    arg_error "Both --gcc-branch and --gcc-commit may not be specified."
+fi
+# Choosing default checkout
+if [ ! "$GCC_BRANCH" ] && [ ! "$GCC_COMMIT" ]; then
+    echo "Assuming GCC checkout tag $GCC_CHECKOUT"
+fi
+if [ "$GCC_COMMIT" ]; then
+    GCC_CHECKOUT="$GCC_COMMIT"
+else
+    GCC_CHECKOUT="$GCC_BRANCH"
+fi
 
 SRC_PATH="$ROOT_PATH/src"
 BLD_PATH="$ROOT_PATH/bld"
